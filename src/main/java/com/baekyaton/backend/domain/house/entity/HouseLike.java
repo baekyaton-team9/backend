@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "house_like")
@@ -27,9 +29,11 @@ public class HouseLike {
 
     @ManyToOne
     @JoinColumn(name = "house_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private House house;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 }

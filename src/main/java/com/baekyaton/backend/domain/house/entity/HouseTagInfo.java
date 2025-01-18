@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "house_tags")
@@ -30,6 +32,7 @@ public class HouseTagInfo {
 
     @ManyToOne
     @JoinColumn(name = "house_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private House house;
 
     @Column(nullable = false)

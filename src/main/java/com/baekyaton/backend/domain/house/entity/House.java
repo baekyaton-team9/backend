@@ -51,4 +51,8 @@ public class House {
     private String description;
 
     private int price;
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
