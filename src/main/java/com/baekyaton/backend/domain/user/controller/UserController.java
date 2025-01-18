@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RequestMapping("/users")
 @RestController
-public class UserController {
-
+public class UserController implements UserApi {
     private final UserService userService;
 
     @GetMapping("/me")

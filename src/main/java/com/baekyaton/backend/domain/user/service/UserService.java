@@ -6,7 +6,6 @@ import com.baekyaton.backend.domain.house.entity.House;
 import com.baekyaton.backend.domain.house.entity.HouseLike;
 import com.baekyaton.backend.domain.house.repository.HouseLikeRepository;
 import com.baekyaton.backend.domain.house.repository.HouseRepository;
-import com.baekyaton.backend.domain.house.repository.HouseTagRepository;
 import com.baekyaton.backend.domain.user.dto.UserDetail;
 import com.baekyaton.backend.domain.user.dto.UserInfoResponse;
 import com.baekyaton.backend.domain.user.dto.UserLikesResponse;

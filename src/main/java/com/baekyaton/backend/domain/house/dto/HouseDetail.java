@@ -20,6 +20,7 @@ public class HouseDetail {
     private String description;
     private int price;
     private int likeCount;
+    private List<String> tags;
 
     public static HouseDetail from(House house) {
         return HouseDetail.builder()
@@ -34,6 +35,7 @@ public class HouseDetail {
                 .description(house.getDescription())
                 .price(house.getPrice())
                 .likeCount(house.getLikeCount())
+                .tags(house.getTags())
                 .build();
     }
 }
