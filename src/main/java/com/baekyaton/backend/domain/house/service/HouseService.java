@@ -3,10 +3,12 @@ package com.baekyaton.backend.domain.house.service;
 import com.baekyaton.backend.domain.house.dto.HouseCreateRequest;
 import com.baekyaton.backend.domain.house.dto.HouseDetail;
 import com.baekyaton.backend.domain.house.entity.House;
+import com.baekyaton.backend.domain.house.entity.HouseImage;
 import com.baekyaton.backend.domain.house.entity.HouseLike;
 import com.baekyaton.backend.domain.house.entity.HouseTagInfo;
 import com.baekyaton.backend.domain.house.enums.HouseTag;
 import com.baekyaton.backend.domain.house.exception.HouseErrorCode;
+import com.baekyaton.backend.domain.house.repository.HouseImageRepository;
 import com.baekyaton.backend.domain.house.repository.HouseLikeRepository;
 import com.baekyaton.backend.domain.house.repository.HouseRepository;
 import com.baekyaton.backend.domain.house.repository.HouseTagRepository;
@@ -32,6 +34,7 @@ public class HouseService {
     private final HouseTagRepository houseTagRepository;
     private final UserRepository userRepository;
     private final HouseLikeRepository houseLikeRepository;
+    private final HouseImageRepository houseImageRepository;
 
     public List<HouseDetail> getAllHouses() {
         return houseRepository.findAll()
@@ -41,23 +44,23 @@ public class HouseService {
     }
 
     @Transactional
-    public void createHouse(MultipartFile image, HouseCreateRequest request) {
-        if (image == null || image.isEmpty()) {
+    public void createHouse(MultipartFile thumbnail, List<MultipartFile> images, HouseCreateRequest request) {
+        if (thumbnail == null || thumbnail.isEmpty()) {
             throw new ApiException(HouseErrorCode.IMAGE_NOT_FOUND);
         }
+
+        String thumbnailUrl = uploadHouseImage(thumbnail, "thumbnails");
 
         House house = House
                 .builder()
                 .title(request.getTitle())
                 .phoneNumber(request.getPhoneNumber())
+                .thumbnailUrl(thumbnailUrl)
                 .address(request.getAddress())
-                .minSize(request.getMinSize())
-                .maxSize(request.getMaxSize())
+                .size(request.getSize())
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .build();
-
-        uploadHouseImage(image, house);
 
         House savedHouse = houseRepository.save(house);
 
@@ -72,15 +75,24 @@ public class HouseService {
 
                     houseTagRepository.save(houseTagInfo);
                 });
+
+        if (!images.isEmpty()) {
+            images.forEach(image -> {
+                String imageUrl = uploadHouseImage(image, "images");
+                HouseImage houseImage = HouseImage.builder()
+                        .imageUrl(imageUrl)
+                        .house(savedHouse)
+                        .build();
+
+                houseImageRepository.save(houseImage);
+            });
+        }
     }
 
-    private void uploadHouseImage(MultipartFile image, House house) {
+    private String uploadHouseImage(MultipartFile image, String path) {
         try {
             String randomName = UUID.randomUUID().toString();
-            String imagePath = s3Service.uploadImageFile(image, "baekyaton/houses/" + randomName);
-
-            house.updateImageUrl(imagePath);
-
+            return s3Service.uploadImageFile(image, "baekyaton/houses/" + path + "/" + randomName);
         } catch (Exception e) {
             e.printStackTrace();
             throw new ApiException(GlobalErrorCode.FILE_UPLOAD_FAILED);

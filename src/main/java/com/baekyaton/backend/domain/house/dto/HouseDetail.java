@@ -11,11 +11,10 @@ public class HouseDetail {
     private Long houseId;
     private UserDetail user;
     private String title;
-    private String imageUrl;
+    private String thumbnailUrl;
     private String phoneNumber;
     private String address;
-    private int minSize;
-    private int maxSize;
+    private int size;
     private String description;
     private int price;
 
@@ -24,14 +23,12 @@ public class HouseDetail {
                 .houseId(house.getId())
                 .user(UserDetail.from(house.getUser()))
                 .title(house.getTitle())
-                .imageUrl(house.getImageUrl())
+                .thumbnailUrl(house.getThumbnailUrl())
                 .phoneNumber(house.getPhoneNumber())
                 .address(house.getAddress())
-                .minSize(house.getMinSize())
-                .maxSize(house.getMaxSize())
+                .size(house.getSize())
                 .description(house.getDescription())
                 .price(house.getPrice())
                 .build();
-
     }
 }

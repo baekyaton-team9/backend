@@ -8,8 +8,7 @@ public class HouseCreateRequest {
     private String title;
     private String phoneNumber;
     private String address;
-    private int minSize;
-    private int maxSize;
+    private int size;
     private String description;
     private int price;
     private List<String> tags;

@@ -1,6 +1,5 @@
 package com.baekyaton.backend.domain.house.entity;
 
-import com.baekyaton.backend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,38 +13,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "house")
+@Table(name = "house_image")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class House {
+public class HouseImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "house_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private House house;
 
-    @Column(nullable = false)
-    private String title;
-
-    @Column(name = "thumbnail_url", nullable = false)
-    private String thumbnailUrl;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(nullable = false)
-    private String address;
-
-    @Column
-    private int size;
-
-    private String description;
-
-    private int price;
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
 }

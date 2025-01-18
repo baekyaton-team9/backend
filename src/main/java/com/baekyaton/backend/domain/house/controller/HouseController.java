@@ -6,6 +6,7 @@ import com.baekyaton.backend.domain.house.service.HouseService;
 import com.baekyaton.backend.global.oauth2.dto.CustomOAuth2User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,10 +29,12 @@ public class HouseController {
         return ResponseEntity.ok(houseService.getAllHouses());
     }
 
-    @PostMapping
-    public ResponseEntity<Void> createHouse(@RequestPart MultipartFile image,
-                                            @RequestPart HouseCreateRequest houseCreateRequest) {
-        houseService.createHouse(image, houseCreateRequest);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> createHouse(
+            @RequestPart MultipartFile thumbnail,
+            @RequestPart List<MultipartFile> images,
+            @RequestPart HouseCreateRequest houseCreateRequest) {
+        houseService.createHouse(thumbnail, images, houseCreateRequest);
         return ResponseEntity.ok().build();
     }
 
