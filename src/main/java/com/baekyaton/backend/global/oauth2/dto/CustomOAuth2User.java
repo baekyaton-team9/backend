@@ -75,6 +75,12 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
         return map.get("nickname");
     }
 
+    public String getProfileImageUrl() {
+        HashMap<String, String> map = (HashMap) attributes.get("properties");
+        if (map == null) return "";
+        return map.get("profile_image_url");
+    }
+
     public Long getUserId() {
         return (Long) attributes.get("userId");
     }

@@ -28,11 +28,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         String kakaoUserId = oAuth2User.getAttributes().get("id").toString();
+        System.out.println("profileImageUrl: " + oAuth2User.getProfileImageUrl());
         User user = userRepository.findByKakaoId(kakaoUserId)
                 .orElseGet(() -> {
                     User newUser = User.builder()
                             .kakaoId(kakaoUserId)
                             .name(oAuth2User.getName())
+                            .profileImageUrl(oAuth2User.getProfileImageUrl())
                             .build();
                     return userRepository.save(newUser);
                 });

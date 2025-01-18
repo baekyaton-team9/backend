@@ -30,6 +30,6 @@ public class User {
     @Column(name = "kakao_id", nullable = false)
     private String kakaoId;
 
-    @Column(name = "profile_image_url", nullable = false)
+    @Column(name = "profile_image_url")
     private String profileImageUrl;
 }

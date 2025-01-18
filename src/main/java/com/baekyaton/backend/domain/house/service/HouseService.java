@@ -3,12 +3,10 @@ package com.baekyaton.backend.domain.house.service;
 import com.baekyaton.backend.domain.house.dto.HouseCreateRequest;
 import com.baekyaton.backend.domain.house.dto.HouseDetail;
 import com.baekyaton.backend.domain.house.entity.House;
-import com.baekyaton.backend.domain.house.entity.HouseImage;
 import com.baekyaton.backend.domain.house.entity.HouseLike;
 import com.baekyaton.backend.domain.house.entity.HouseTagInfo;
 import com.baekyaton.backend.domain.house.enums.HouseTag;
 import com.baekyaton.backend.domain.house.exception.HouseErrorCode;
-import com.baekyaton.backend.domain.house.repository.HouseImageRepository;
 import com.baekyaton.backend.domain.house.repository.HouseLikeRepository;
 import com.baekyaton.backend.domain.house.repository.HouseRepository;
 import com.baekyaton.backend.domain.house.repository.HouseTagRepository;
@@ -18,6 +16,7 @@ import com.baekyaton.backend.domain.user.repository.UserRepository;
 import com.baekyaton.backend.global.exception.ApiException;
 import com.baekyaton.backend.global.exception.GlobalErrorCode;
 import com.baekyaton.backend.global.external.s3.S3Service;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class HouseService {
     private final HouseTagRepository houseTagRepository;
     private final UserRepository userRepository;
     private final HouseLikeRepository houseLikeRepository;
-    private final HouseImageRepository houseImageRepository;
 
     public List<HouseDetail> getAllHouses() {
         return houseRepository.findAll()
@@ -44,22 +42,36 @@ public class HouseService {
     }
 
     @Transactional
-    public void createHouse(MultipartFile thumbnail, List<MultipartFile> images, HouseCreateRequest request) {
+    public void createHouse(Long userId, MultipartFile thumbnail, List<MultipartFile> images, HouseCreateRequest request) {
         if (thumbnail == null || thumbnail.isEmpty()) {
             throw new ApiException(HouseErrorCode.IMAGE_NOT_FOUND);
         }
 
+        List<String> imageUrls = new ArrayList<>();
         String thumbnailUrl = uploadHouseImage(thumbnail, "thumbnails");
+
+        if (!images.isEmpty()) {
+            images.forEach(image -> {
+                String imageUrl = uploadHouseImage(image, "images");
+                imageUrls.add(imageUrl);
+            });
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND));
 
         House house = House
                 .builder()
                 .title(request.getTitle())
+                .user(user)
                 .phoneNumber(request.getPhoneNumber())
                 .thumbnailUrl(thumbnailUrl)
+                .imageUrls(imageUrls)
                 .address(request.getAddress())
                 .size(request.getSize())
                 .description(request.getDescription())
                 .price(request.getPrice())
+                .likeCount(0)
                 .build();
 
         House savedHouse = houseRepository.save(house);
@@ -75,18 +87,6 @@ public class HouseService {
 
                     houseTagRepository.save(houseTagInfo);
                 });
-
-        if (!images.isEmpty()) {
-            images.forEach(image -> {
-                String imageUrl = uploadHouseImage(image, "images");
-                HouseImage houseImage = HouseImage.builder()
-                        .imageUrl(imageUrl)
-                        .house(savedHouse)
-                        .build();
-
-                houseImageRepository.save(houseImage);
-            });
-        }
     }
 
     private String uploadHouseImage(MultipartFile image, String path) {
@@ -111,6 +111,12 @@ public class HouseService {
         House house = houseRepository.findById(houseId)
                 .orElseThrow(() -> new ApiException(HouseErrorCode.HOUSE_NOT_FOUND));
 
+        if (houseLikeRepository.existsByHouseIdAndUserId(houseId, userId)) {
+            houseLikeRepository.deleteByHouseIdAndUserId(houseId, userId);
+            house.postDislike();
+            return;
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND));
 
@@ -120,6 +126,8 @@ public class HouseService {
                 .build();
 
         houseLikeRepository.save(houseLike);
+
+        house.postLike();
     }
 
     @Transactional

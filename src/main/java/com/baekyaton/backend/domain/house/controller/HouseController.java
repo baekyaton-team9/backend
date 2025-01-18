@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/houses")
 @RequiredArgsConstructor
-public class HouseController {
+public class HouseController implements HouseApi {
     private final HouseService houseService;
 
     @GetMapping
@@ -31,10 +31,11 @@ public class HouseController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createHouse(
+            @AuthenticationPrincipal CustomOAuth2User principal,
             @RequestPart MultipartFile thumbnail,
             @RequestPart List<MultipartFile> images,
-            @RequestPart HouseCreateRequest houseCreateRequest) {
-        houseService.createHouse(thumbnail, images, houseCreateRequest);
+            @RequestPart HouseCreateRequest request) {
+        houseService.createHouse(principal.getUserId(), thumbnail, images, request);
         return ResponseEntity.ok().build();
     }
 
