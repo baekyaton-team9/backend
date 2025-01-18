@@ -1,6 +1,7 @@
 package com.baekyaton.backend.domain.house.entity;
 
 import com.baekyaton.backend.domain.house.enums.HouseTag;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,7 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "house_tag")
+@Table(name = "house_tags")
 @Getter
 @Builder
 @AllArgsConstructor
@@ -31,6 +32,7 @@ public class HouseTagInfo {
     @JoinColumn(name = "house_id")
     private House house;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private HouseTag tag;
 }

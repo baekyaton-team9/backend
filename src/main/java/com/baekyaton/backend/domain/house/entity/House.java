@@ -30,6 +30,7 @@ public class House {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
     private String title;
 
     @Column(name = "image_url")
@@ -38,7 +39,8 @@ public class House {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    private String location;
+    @Column(nullable = false)
+    private String address;
 
     @Column(name = "min_size")
     private int minSize;
